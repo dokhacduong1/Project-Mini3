@@ -101,3 +101,9 @@
 .body0 .input-search{
     border: 1px solid #5c5c5c
 }
+
+@media screen and (max-width: 576px) {
+   .pagination{
+    display: inline-table;
+   }
+  }
