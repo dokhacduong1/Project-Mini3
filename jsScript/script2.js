@@ -44,15 +44,15 @@ function pagePagination() {
 function loadDataServer(dataLink = "") {
 
     //Hàm này lấy data toàn cục của web
-    fetch(`http://localhost:3000/products?${dataLink}`)
+    fetch(`https://json-server-duong.vercel.app/products?${dataLink}`)
         .then(reponse => reponse.json())
         .then((data) => {
             let htmlA = data.map((info) => {
 
-                return `<div class="boxItem-image1 col-4">
+                return `<div class="boxItem-image1 col-xl-4 col-lg-4 col-md-4 col-sm-6">
                             <img src="${info.images[0]}" alt="">
                             <h6>Tên Sản Phẩm: ${info.title}</h2>
-                            <p>Giá: ${info.price}</p>
+                            <p>Giá: <strong>${info.price} <i class="fa-solid fa-coins"></i></strong></p>
                         </div>`
             });
             boxItem.innerHTML = htmlA.join("");
@@ -65,7 +65,7 @@ async function loadDataCategory(dataLink = "") {
     //Hàm này lấy cái dữ liệu danh mục và trả về
     let inputCategoryInNav = document.getElementById("nav-cate");
 
-    await fetch("http://localhost:3000/category")
+    await fetch("https://json-server-duong.vercel.app/category")
         .then(reponse => reponse.json())
         .then((data) => {
             let htmlA = data.map((info) => {
@@ -149,7 +149,7 @@ async function checkSoLuongSanPham(dataLink = "") {
 
     let response = null
 
-    response = await fetch(`http://localhost:3000/products?${dataLink}`);
+    response = await fetch(`https://json-server-duong.vercel.app/products?${dataLink}`);
 
     let data = await response.json();
 
@@ -311,7 +311,7 @@ function checkInputSearch() {
         loadDataServer(dataConvert);
         (await showDataPagination(dataConvert, inputValue)).searchPagi();
     });
-    
+
 }
 //End Search
 

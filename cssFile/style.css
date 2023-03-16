@@ -10,9 +10,10 @@
     margin-left: 0px;
     width: 100%;
     z-index: 999;
-    
+    padding: 10px;
     
 }
+
 #iconHome{
     text-decoration: none;
     color: white;
