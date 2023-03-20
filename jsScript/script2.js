@@ -7,9 +7,17 @@ var listLi = document.querySelectorAll("#pagina li");
 
 var saveActivePagination = 0;
 
+var saveTab = 1;
+
+var saveTextCategory = "";
+
 var saveTextPagination = "";
 
+var saveTextSearch = "";
+
 var indexPagination = 1;
+
+var saveSort = 1;
 
 async function showHome() {
     let pagination = await showDataPagination();
@@ -20,15 +28,36 @@ async function showHome() {
 function pagePagination() {
 
     let homePage = (indexTab) => {
-        return `_page=${indexTab}&_limit=9`;
+        if (saveSort == 1) {
+            return `_page=${indexTab}&_limit=9`;
+        } else if (saveSort == 2) {
+            return `_page=${indexTab}&_limit=9&_sort=price&_order=asc`;
+        } else if (saveSort == 3) {
+            return `_page=${indexTab}&_limit=9&_sort=price&_order=desc`;
+        }
     }
 
     let navPage = (textCategory, indexTab) => {
-        return `category=${textCategory}&&_page=${indexTab}&_limit=9`;
+        if (saveSort == 1) {
+            return `category=${textCategory}&&_page=${indexTab}&_limit=9`;
+        } else if (saveSort == 2) {
+            console.log("2")
+            return `category=${textCategory}&&_page=${indexTab}&_limit=9&_sort=price&_order=asc`;
+        } else if (saveSort == 3) {
+            console.log("3")
+            return `category=${textCategory}&&_page=${indexTab}&_limit=9&_sort=price&_order=desc`;
+        }
     }
 
     let searchPage = (title, indexTab) => {
-        return `title=${title}&&_page=${indexTab}&_limit=9`;
+        if (saveSort == 1) {
+            return `title=${title}&&_page=${indexTab}&_limit=9`;
+        } else if (saveSort == 2) {
+            return `title=${title}&&_page=${indexTab}&_limit=9&_sort=price&_order=asc`;
+        }
+        else if (saveSort == 3) {
+            return `title=${title}&&_page=${indexTab}&_limit=9&_sort=price&_order=desc`;
+        }
     }
 
     return {
@@ -47,6 +76,13 @@ function loadDataServer(dataLink = "") {
     fetch(`https://json-server-duong.vercel.app/products?${dataLink}`)
         .then(reponse => reponse.json())
         .then((data) => {
+            if(data.length == 0){
+                let boxItem= document.getElementById("boxItem");
+                boxItem.innerHTML = `<div class="text-center col-12">
+                                        <p><strong>Không Có Sản Phẩm Nào Được Hiển Thị</strong></p>
+                                    </div>`
+                                    return;
+            }
             let htmlA = data.map((info) => {
 
                 return `<div class="boxItem-image1 col-xl-4 col-lg-4 col-md-4 col-sm-6">
@@ -124,6 +160,9 @@ function checkClickCategoryBtn(tagLiCategory) {
             //Convert sang chữ thường
             saveActivePagination = 0;
             let convertTextToLowwer = tagLiCategory[i].textContent.charAt(0).toLowerCase() + tagLiCategory[i].textContent.slice(1);
+
+            saveTextCategory = convertTextToLowwer;
+
             let dataConvert = pagePagination().navPage(convertTextToLowwer, 1);
             //Load data của web khi chuyển qua danh mục mới
             loadDataServer(dataConvert);
@@ -176,17 +215,20 @@ async function showDataPagination(dataPagination = "", textData = "") {
 
     //Đoạn này chia ra từng mục để load dữ liệ pagati
     let homePagination = async () => {
+        saveTab = 1;
         await checkClickPaginationNumber().homePageNumberPagination();
         await checkClickPaginationBtn().onClickNext(1);
         await checkClickPaginationBtn().onClickPres(1);
     }
 
     let navPagi = async () => {
+        saveTab = 2;
         await checkClickPaginationNumber().navPageNumberPagination(textData);
         await checkClickPaginationBtn(textData).onClickNext(2);
         await checkClickPaginationBtn(textData).onClickPres(2);
     }
     let searchPagi = async () => {
+        saveTab = 3;
         await checkClickPaginationNumber().searchPageNumberPagination(textData);
         await checkClickPaginationBtn(textData).onClickNext(3);
         await checkClickPaginationBtn(textData).onClickPres(3);
@@ -306,6 +348,15 @@ function checkInputSearch() {
 
     button.addEventListener("click", async () => {
         let inputValue = input.value;
+        
+        if(inputValue.length == 0){
+            let boxItem= document.getElementById("boxItem");
+            boxItem.innerHTML = `<div class="text-center col-12">
+            <p><strong>Vui Lòng Nhập Sản Phẩm</strong></p>
+        </div>`
+        return;
+        }
+        saveTextSearch = inputValue;
         let dataConvert = pagePagination().searchPage(inputValue, 1);
         saveActivePagination = 0;
         loadDataServer(dataConvert);
@@ -316,6 +367,56 @@ function checkInputSearch() {
 //End Search
 
 
+//CheckSort
+function checkSort() {
+    let sortAsc = document.getElementById("sort-asc");
+    let sortDesc = document.getElementById("sort-desc");
+    let sortNormal = document.getElementById("sort-normal");
+    sortNormal.addEventListener("click", async () => {
+        saveSort = 1
+        if (saveTab == 1) {
+            loadDataServer(pagePagination().homePage(saveActivePagination + 1));
+        } else if (saveTab == 2) {
+            let dataConvert = pagePagination().navPage(saveTextCategory, saveActivePagination + 1);
+            loadDataServer(dataConvert);
+        }
+        else if (saveTab == 3) {
+            let dataConvert = pagePagination().searchPage(saveTextSearch, 1);
+            loadDataServer(dataConvert);
+        }
+
+    });
+    sortAsc.addEventListener("click", async () => {
+        saveSort = 2;
+        if (saveTab == 1) {
+            loadDataServer(pagePagination().homePage(saveActivePagination + 1));
+        } else if (saveTab == 2) {
+            let dataConvert = pagePagination().navPage(saveTextCategory, saveActivePagination + 1);
+            loadDataServer(dataConvert);
+        } else if (saveTab == 3) {
+            console.log("1")
+            let dataConvert = pagePagination().searchPage(saveTextSearch, 1);
+            loadDataServer(dataConvert);
+        }
+
+    });
+    sortDesc.addEventListener("click", async () => {
+        saveSort = 3;
+        if (saveTab == 1) {
+            loadDataServer(pagePagination().homePage(saveActivePagination + 1));
+        } else if (saveTab == 2) {
+            let dataConvert = pagePagination().navPage(saveTextCategory, saveActivePagination + 1);
+            loadDataServer(dataConvert);
+        } else if (saveTab == 3) {
+            console.log("2")
+            let dataConvert = pagePagination().searchPage(saveTextSearch, 1);
+            loadDataServer(dataConvert);
+        }
+
+    });
+}
+//EndSort
+
 
 
 // Thêm sự kiện click cho button
@@ -325,5 +426,5 @@ showHome();
 showAndHideCategory();
 loadDataCategory();
 checkInputSearch();
-
+checkSort();
 

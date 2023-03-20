@@ -101,7 +101,15 @@
 .body0 .input-search{
     border: 1px solid #5c5c5c
 }
-
+.sort .item-sort{
+    display: flex;
+    align-items: center;
+}
+.item-sort label{
+    margin-bottom: 0;
+    margin-right: 15px;
+    margin-left: 5px;
+}
 @media screen and (max-width: 576px) {
    .pagination{
     display: inline-table;
